@@ -1,0 +1,5 @@
+terraform.tfstate*
+.terraform
+*.log
+*.lock.info
+deployment.log
