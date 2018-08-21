@@ -15,9 +15,8 @@ resource "aws_ecs_task_definition" "discord_bot" {
   [{
     "name": "discord_bot_container",
     "cpu": ${var.fargate_cpu},
-    "image": "${var.app_image}",
     "memory": ${var.fargate_memory},
-    "image": ${var.docker_image},
+    "image": "${var.docker_image}",
     "networkMode": "awsvpc",
     "environment": [{
       "name": "TOKEN",
