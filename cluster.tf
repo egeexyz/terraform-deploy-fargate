@@ -1,46 +1,52 @@
-resource "aws_ecs_cluster" "test_cluster" {
+resource "aws_ecs_cluster" "main" {
   name = "test-cluster"
 }
 
 resource "aws_ecs_task_definition" "discord_bot" {
   family                   = "discord_bot"
-  cpu                      = 256
-  memory                   = 512
-  requires_compatibilities = ["FARGATE"]
   network_mode             = "awsvpc"
   task_role_arn            = "arn:aws:iam::540854239492:role/ecsTaskExecutionRole"
   execution_role_arn       = "arn:aws:iam::540854239492:role/ecsTaskExecutionRole"
+  requires_compatibilities = ["FARGATE"]
+  cpu                      = "${var.fargate_cpu}"
+  memory                   = "${var.fargate_memory}"
+
   container_definitions = <<DEFINITION
-  [
-    {
-      "environment": [{
-        "name": "TOKEN",
-        "value": "CHANGE_ME"
-      }],
-      "name": "discord_bot_container",
-      "essential": true,
-      "image": "540854239492.dkr.ecr.us-west-2.amazonaws.com/eg-repo:latest"
-    }
-  ]
+  [{
+    "name": "discord_bot_container",
+    "cpu": ${var.fargate_cpu},
+    "image": "${var.app_image}",
+    "memory": ${var.fargate_memory},
+    "image": ${var.docker_image},
+    "networkMode": "awsvpc",
+    "environment": [{
+      "name": "TOKEN",
+      "value": "CHANGE_ME"
+    }]
+  }]
   DEFINITION
 }
 
-resource "aws_ecs_service" "test" {
-  name            = "Terraform_Test"
-  cluster         = "${aws_ecs_cluster.test_cluster.id}"
+resource "aws_ecs_service" "androgee" {
+  name            = "androgee"
+  cluster         = "${aws_ecs_cluster.main.id}"
   task_definition = "${aws_ecs_task_definition.discord_bot.arn}"
   desired_count   = 1
   launch_type     = "FARGATE"
-#   network_configuration {
-#     security_groups = ["${aws_vpc.my_vpc.default_security_group_id}"]
-#     subnets         = ["${aws_subnet.private.*.id}"]
-# }
-  # iam_role        = "${aws_iam_role.foo.arn}"
-  # depends_on      = ["aws_iam_role_policy.foo"]
 
-  # placement_constraints {
-  #   type       = "memberOf"
-  #   expression = "attribute:ecs.availability-zone in [us-west-2a, us-west-2b]"
+  network_configuration {
+    assign_public_ip = true
+    security_groups  = ["${aws_security_group.alb-sg-02.id}"]
+    subnets          = ["${aws_subnet.private.*.id}"]
+  }
+
+  # load_balancer {
+  #   target_group_arn = "${aws_alb_target_group.app.id}"
+  #   container_name   = "app"
+  #   container_port   = "${var.app_port}"
   # }
-}
 
+  # depends_on = [
+  #   "aws_alb_listener.front_end",
+  # ]
+}
