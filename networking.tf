@@ -1,18 +1,25 @@
+##########################
+## This file contains all networking resources 
+## required to wire up containers in ECS.
+##
+## Several tf modules could be create from
+## the resources in this file.
+#########################
 data "aws_availability_zones" "avail_zones" {}
 
 resource "aws_vpc" "demo-vpc" {
-  cidr_block           = "10.0.0.0/16"
+  cidr_block           = "${var.vpc_cidr}"
 }
 
 resource "aws_subnet" "private" {
-  count             = "2"
+  count             = "${var.public_subnet_count}"
   cidr_block        = "${cidrsubnet(aws_vpc.demo-vpc.cidr_block, 8, count.index)}"
   availability_zone = "${data.aws_availability_zones.avail_zones.names[count.index]}"
   vpc_id            = "${aws_vpc.demo-vpc.id}"
 }
 
 resource "aws_subnet" "public" {
-  count                   = "2"
+  count                   = "${var.private_subnet_count}"
   cidr_block              = "${cidrsubnet(aws_vpc.demo-vpc.cidr_block, 8, "${var.az_count}" + count.index)}"
   availability_zone       = "${data.aws_availability_zones.avail_zones.names[count.index]}"
   vpc_id                  = "${aws_vpc.demo-vpc.id}"
@@ -24,14 +31,14 @@ resource "aws_internet_gateway" "demo-igw" {
 }
 
 resource "aws_route" "demo-routetable" {
+  destination_cidr_block = "${var.internet_cidr}"
   route_table_id         = "${aws_vpc.demo-vpc.main_route_table_id}"
-  destination_cidr_block = "0.0.0.0/0"
   gateway_id             = "${aws_internet_gateway.demo-igw.id}"
 }
 
 resource "aws_eip" "demo-elasticip" {
-  count      = "${var.az_count}"
   vpc        = true
+  count      = "${var.az_count}"
   depends_on = ["aws_internet_gateway.demo-igw"]
 }
 
@@ -46,7 +53,7 @@ resource "aws_route_table" "private" {
   vpc_id = "${aws_vpc.demo-vpc.id}"
 
   route {
-    cidr_block = "0.0.0.0/0"
+    cidr_block     = "${var.internet_cidr}"
     nat_gateway_id = "${element(aws_nat_gateway.demo-nat.*.id, count.index)}"
   }
 }
