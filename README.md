@@ -13,7 +13,7 @@ Before using this repo, make sure you've got these things:
 * General understanding around networking
 * A Docker image (or 3) located in a cloud repository (I used ECR for this, Docker Hub et al would be fine too)
 
-There's a handy Terraform wrapper-script included in this repo that helps wrap common Terraform commands and generally makes using Terraform easier. It's not required but it's very useful, especially if you want to run Terraform as part of a CI/CD pipeline.
+There's a handy [Terraform wrapper-script](https://github.com/egee-irl/terraform.sh) included in this repo that helps wrap common Terraform commands and generally makes using Terraform easier. It's not required but it's very useful, especially if you want to run Terraform as part of a CI/CD pipeline.
 
 ### State Files
 
@@ -58,7 +58,7 @@ This file consists of three security groups that are required for ECS services t
 This file contains the Elastic Container Service cluster, the ECS task definitions, and the ECS service definitions. The task and service definitions are specific for my particular use case when crafting this reference module. The resulting services are:
 
 * [Website](https://github.com/Egeeio/egeeio-website/tree/emberjs) running on EmberJS in development mode
-* NodeJS webserver serving up a [game](https://github.com/egee-irl/jumper) written with PhaserJS
+* [Game](https://github.com/egee-irl/jumper) written with PhaserJS served up on NodeJS http-server
 * [Discord bot](https://github.com/Egeeio/suzy/tree/typescript) written in TypeScript connecting to my Discord server
 
 Each of these services have their own CI/CD pipelines that create Docker images which are stored in ECR as a result of the creation of a Git tag. You can view the repositories of each service by clicking on the links above.
@@ -90,4 +90,4 @@ A fixed version of Terraform is downloaded, extracted, and run on the Travis run
 
 The `terraform.sh` script is used with the -auto-approve flag so that the deployment can happen without any user intervention (which would be undesirable, especially on a managed service). The helper script also outputs to a log file which is retrievable on the build runner.
 
-**Disclaimer** This CI/CD pipeline does not account for the tf State File! If you want to run Terraform in an automated fashion, you must use a provider for your State File so that it's stored in a reasonable place such as S3. With this simple pipeline, the State File will be stored on the Travis runner which is inconvenient to say the least.
+**Disclaimer** This CI/CD pipeline does not account for the TF State File! If you want to run Terraform in an automated fashion, you must use a provider for your State File so that it's stored in a reasonable place such as S3. With this simple pipeline, the State File will be stored on the Travis runner which is inconvenient to say the least.
