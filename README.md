@@ -13,7 +13,7 @@ Before using this repo, make sure you've got these things:
 * General understanding around networking
 * A Docker image (or 3) located in a cloud repository (I used ECR for this, Docker Hub et al would be fine too)
 
-There's a handy Terraform wrapper-script included in this repo that helps wrap common Terraform commands and generally makes using Terraform easier. It's not required but it's very useful especially if you want to run Terraform as part of a CI/CD pipeline.
+There's a handy Terraform wrapper-script included in this repo that helps wrap common Terraform commands and generally makes using Terraform easier. It's not required but it's very useful, especially if you want to run Terraform as part of a CI/CD pipeline.
 
 ### State Files
 
@@ -25,7 +25,7 @@ This module consists of four distinct `.tf` files which contain Terraform resour
 
 #### network.tf
 
-Networking and VPCs are the canonical entry point to an application in AWS and this file contains everything pertaining to the networking plumbing required for your ECS resources to communicate. The defaults are:
+Networking and VPCs are the canonical entry point to an application in AWS, and this file contains everything pertaining to the networking plumbing required for your ECS resources to communicate. The defaults are:
 
 * Two availability zones
 * Two distinct subnets (Public and Private)
@@ -67,13 +67,27 @@ These resources can and should be broken up into resources. The defaults are:
 
 * A single ECS Cluster
 * Each task definition:
-  * uses awsvpc networking mode
-  * uses FARGATE capabilities
+  * uses `awsvpc` networking mode
+  * uses `FARGATE` capabilities
   * is associated with an existing role ARN (ECS creates this for you, but you could create your own)
 * Each service definition:
-  * uses the FARGATE launch type
+  * uses the `FARGATE` launch type
   * is associated with exactly one task definition
 * The website service definition has a desired count of 2 to span availability zones
 * Ports are hardcoded because Terraform is weird with strings and ints (extra vars can resolve this)
 
 #### vars.tf
+
+This file contains variables that can act as parameters to dynamically configure your application on ECS. Examine and modify to suit your needs.
+
+### Continuous Delivery Pipeline
+
+This repository also has a very basic sample of what a Terraform CD pipeline would look like running on a managed service such as TravisCI.
+
+Deployments to AWS are triggered via Git tags using the `deploy` section in the `.travis.yml` file. While this isn't required, it is a handy recommendation otherwise a deploy would happen each time code is checked into the repository.
+
+A fixed version of Terraform is downloaded, extracted, and run on the Travis runner. The Terraform version is important because Terraform isn't often backwards compatible and if a new version is released, you may discover your infrastructure or state file is in a weird state.
+
+The `terraform.sh` script is used with the -auto-approve flag so that the deployment can happen without any user intervention (which would be undesirable, especially on a managed service). The helper script also outputs to a log file which is retrievable on the build runner.
+
+**Disclaimer** This CI/CD pipeline does not account for the tf State File! If you want to run Terraform in an automated fashion, you must use a provider for your State File so that it's stored in a reasonable place such as S3. With this simple pipeline, the State File will be stored on the Travis runner which is inconvenient to say the least.
