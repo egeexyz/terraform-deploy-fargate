@@ -22,3 +22,14 @@ The code in this repository does not account for the Terraform State File. By de
 ### Module Organization
 
 This module consists of four distinct `.tf` files which contain Terraform resources. You could easily break each file out into it's own external Terraform Module, however I kept everything contained to a single module because it's easier to read and understand. There's also a `vars.tf` file which includes variables and parameters you'll want to change for your own solution.
+
+#### network.tf
+
+Networking and VPCs are the canonical entry point to an application in AWS and this file contains everything pertaining to the networking plumbing required for your ECS resources to communicate. The defaults are:
+
+* Two availability zones
+* Two distinct subnets (Public and Private)
+* A NAT-Gateway for each public subnet
+  * A route table to associate the private subnets with the NAT
+* An Elastic IP for each availability zone
+  * Attached to the same Internet Gateway

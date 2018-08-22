@@ -42,7 +42,7 @@ resource "aws_eip" "demo-elasticip" {
 }
 
 resource "aws_nat_gateway" "demo-nat" {
-  count         = "${var.az_count}"
+  count         = "${var.public_subnet_count}"
   subnet_id     = "${element(aws_subnet.public.*.id, count.index)}"
   allocation_id = "${element(aws_eip.demo-elasticip.*.id, count.index)}"
 }
