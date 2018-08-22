@@ -1,3 +1,10 @@
+#########################################
+## This file contains a single ALB,     #
+## two target groups, and two listeners #
+##                                      #
+## Only 2 of the services need ingress  #
+#########################################
+
 resource "aws_alb" "demo-alb" {
   name            = "demo-alb"
   subnets         = ["${aws_subnet.public.*.id}"]
