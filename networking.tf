@@ -1,11 +1,10 @@
-##########################
-## This file contains all networking resources 
-## required to wire up containers in ECS.
-##
-## Several tf modules could be create from
-## the resources in this file.
-#########################
-data "aws_availability_zones" "avail_zones" {}
+################################################
+## This file contains all networking resources #
+## required to wire up containers in ECS.      #
+##                                             #
+## Ideally, this file would be a tf module     #
+################################################
+data "aws_availability_zones" "avail-zones" {}
 
 resource "aws_vpc" "demo-vpc" {
   cidr_block           = "${var.vpc_cidr}"
@@ -14,14 +13,14 @@ resource "aws_vpc" "demo-vpc" {
 resource "aws_subnet" "private" {
   count             = "${var.public_subnet_count}"
   cidr_block        = "${cidrsubnet(aws_vpc.demo-vpc.cidr_block, 8, count.index)}"
-  availability_zone = "${data.aws_availability_zones.avail_zones.names[count.index]}"
+  availability_zone = "${data.aws_availability_zones.avail-zones.names[count.index]}"
   vpc_id            = "${aws_vpc.demo-vpc.id}"
 }
 
 resource "aws_subnet" "public" {
   count                   = "${var.private_subnet_count}"
   cidr_block              = "${cidrsubnet(aws_vpc.demo-vpc.cidr_block, 8, "${var.az_count}" + count.index)}"
-  availability_zone       = "${data.aws_availability_zones.avail_zones.names[count.index]}"
+  availability_zone       = "${data.aws_availability_zones.avail-zones.names[count.index]}"
   vpc_id                  = "${aws_vpc.demo-vpc.id}"
   map_public_ip_on_launch = true
 }
