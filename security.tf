@@ -27,7 +27,8 @@ resource "aws_security_group" "alb-sg-02" {
     protocol        = "tcp"
     from_port       = "${var.app_port}"
     to_port         = "${var.app_port}"
-    security_groups = ["${aws_security_group.alb-sg.id}"]
+    cidr_blocks     = ["0.0.0.0/0"]
+    //security_groups = ["${aws_security_group.alb-sg.id}"] // TODO: This doesn't seem to work
   }
 
   egress {
