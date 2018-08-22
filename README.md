@@ -2,6 +2,8 @@
 
 ## A meta-module for deploying a small cluster of services to AWS ECS with Fargate
 
+[![Build Status](https://travis-ci.org/egee-irl/terraform-deploy-fargate.svg?branch=master)](https://travis-ci.org/egee-irl/terraform-deploy-fargate)
+
 **Disclaimer** - This repo is not an _out-of-the-box_ solution for using Terraform to deploy to ECS. Instead, this repo serves as a reference for folks Googling documentation and samples on how to deploy to AWS Elastic Container Service using Fargate.
 
 ### Prerequisites
