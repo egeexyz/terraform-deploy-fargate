@@ -33,3 +33,47 @@ Networking and VPCs are the canonical entry point to an application in AWS and t
   * A route table to associate the private subnets with the NAT
 * An Elastic IP for each availability zone
   * Attached to the same Internet Gateway
+
+#### alb.tf
+
+This file contains a single Application Load Balancer, associated with the public subnet, two target groups, and two ALB listeners. The defaults are:
+
+* A standard Application Load Balancer (Classic Load Balancers aren't supported well)
+* Target Groups use `target_type=ip`
+* Target Groups use HTTP
+  * ALB Listeners also
+* Target Group ports are hardcoded because Terraform is weird with strings and ints (extra vars can resolve this)
+  * ALB Listeners also
+
+#### security.tf
+
+This file consists of three security groups that are required for ECS services to communicate with one another and with the outside world. The defaults are:
+
+* A security group specifically for the ALB
+  * Ingress rules for each world-facing port
+* A security group for each service requiring outside connection (proxied by the ALB)
+
+#### cluster.tf
+
+This file contains the Elastic Container Service cluster, the ECS task definitions, and the ECS service definitions. The task and service definitions are specific for my particular use case when crafting this reference module. The resulting services are:
+
+* [Website](https://github.com/Egeeio/egeeio-website/tree/emberjs) running on EmberJS in development mode
+* NodeJS webserver serving up a [game](https://github.com/egee-irl/jumper) written with PhaserJS
+* [Discord bot](https://github.com/Egeeio/suzy/tree/typescript) written in TypeScript connecting to my Discord server
+
+Each of these services have their own CI/CD pipelines that create Docker images which are stored in ECR as a result of the creation of a Git tag. You can view the repositories of each service by clicking on the links above.
+
+These resources can and should be broken up into resources. The defaults are:
+
+* A single ECS Cluster
+* Each task definition:
+  * uses awsvpc networking mode
+  * uses FARGATE capabilities
+  * is associated with an existing role ARN (ECS creates this for you, but you could create your own)
+* Each service definition:
+  * uses the FARGATE launch type
+  * is associated with exactly one task definition
+* The website service definition has a desired count of 2 to span availability zones
+* Ports are hardcoded because Terraform is weird with strings and ints (extra vars can resolve this)
+
+#### vars.tf
