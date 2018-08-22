@@ -11,7 +11,7 @@ initialize() {
 
 execute() {
     set -o pipefail
-    terraform $COMMAND | \
+    terraform $COMMAND $AUTO_APPROVE | \
     tee -a "deployment.log"
 }
 
@@ -20,7 +20,7 @@ help() {
 }
 
 COMMAND=$1
-AUTO_APPROVE=$3
+AUTO_APPROVE=$2
 
 if [[ -z ${COMMAND} ]]; then
     help
