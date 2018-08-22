@@ -3,6 +3,8 @@ sudo: false
 script:
   - wget https://releases.hashicorp.com/terraform/0.11.8/terraform_0.11.8_linux_amd64.zip
   - unzip terraform_0.11.8_linux_amd64.zip
+  - mkdir $HOME/.local/bin && mv terraform $HOME/.local/bin
+  - export PATH=$PATH:$HOME/.local/bin
 deploy:
   - provider: script
     skip_cleanup: true
