@@ -3,14 +3,19 @@ variable "az_count" {
   default     = "2"
 }
 
-variable "docker_image" {
+variable "androgee_image" {
   description = "Docker image to run in the ECS cluster"
   default     = "540854239492.dkr.ecr.us-west-2.amazonaws.com/eg-repo:latest"
 }
 
+variable "egeeio_image" {
+  description = "Docker image to run in the ECS cluster"
+  default     = "540854239492.dkr.ecr.us-west-2.amazonaws.com/eg-website:latest"
+}
+
 variable "app_port" {
   description = "Port exposed by the docker image to redirect traffic to"
-  default     = 3000
+  default     = 4200
 }
 
 variable "fargate_cpu" {
