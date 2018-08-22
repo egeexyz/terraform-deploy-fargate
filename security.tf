@@ -38,8 +38,7 @@ resource "aws_security_group" "website-sg" {
     protocol        = "tcp"
     from_port       = "${var.website_port}"
     to_port         = "${var.website_port}"
-    cidr_blocks     = ["${var.internet_cidr}"]
-    //security_groups = ["${aws_security_group.alb-sg.id}"] // TODO: This doesn't seem to work
+    security_groups = ["${aws_security_group.alb-sg.id}"]
   }
 
   egress {
@@ -58,8 +57,7 @@ resource "aws_security_group" "jumpdude-sg" {
     protocol        = "tcp"
     from_port       = "${var.game_port}"
     to_port         = "${var.game_port}"
-    cidr_blocks     = ["${var.internet_cidr}"]
-    //security_groups = ["${aws_security_group.alb-sg.id}"] // TODO: This doesn't seem to work
+    security_groups = ["${aws_security_group.alb-sg.id}"]
   }
 
   egress {
