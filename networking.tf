@@ -11,14 +11,14 @@ resource "aws_vpc" "demo-vpc" {
 }
 
 resource "aws_subnet" "private" {
-  count             = "${var.public_subnet_count}"
+  count             = "${var.private_subnet_count}"
   cidr_block        = "${cidrsubnet(aws_vpc.demo-vpc.cidr_block, 8, count.index)}"
   availability_zone = "${data.aws_availability_zones.avail-zones.names[count.index]}"
   vpc_id            = "${aws_vpc.demo-vpc.id}"
 }
 
 resource "aws_subnet" "public" {
-  count                   = "${var.private_subnet_count}"
+  count                   = "${var.public_subnet_count}"
   cidr_block              = "${cidrsubnet(aws_vpc.demo-vpc.cidr_block, 8, "${var.az_count}" + count.index)}"
   availability_zone       = "${data.aws_availability_zones.avail-zones.names[count.index]}"
   vpc_id                  = "${aws_vpc.demo-vpc.id}"
